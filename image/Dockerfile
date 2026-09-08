@@ -200,14 +200,14 @@ ENV PATH="$PATH:/opt/code-server/bin"
 COPY --from=vscode-builder /usr/local/bin/code /usr/local/bin/
 
 # 安装 GCC
-#COPY --from=gcc-builder   /opt/gcc/   /opt/gcc/
-#RUN echo /opt/gcc/lib64 >/etc/ld.so.conf.d/opt-gcc.conf && ldconfig
-#RUN echo 'export PATH+=:/opt/gcc/bin' >>/etc/profile
-#ENV PATH="$PATH:/opt/gcc/bin"
-#RUN echo 'export CC=/opt/gcc/bin/gcc CXX=/opt/gcc/bin/g++' >>/etc/profile
-RUN apt install -y `apt search --names-only '^g\+\+-[0-9]+$' | grep '^g++-[0-9]\+' | awk -F/ '{print $1}' | sort -V -r | head -n 1` >/dev/null
-RUN CC=`ls -1 /usr/bin/gcc-* | grep '/gcc-[0-9]\+$' | sort -V -r | head -n 1`; CXX=${CC/gcc/g++}; echo "export CC=$CC CXX=$CXX" >>/etc/profile; (cd /usr/local/bin; ln -s $CC gcc; ln -s $CXX g++)
-RUN cd /usr/local/bin; ln -s gcc cc; ln -s g++ c++
+#RUN apt install -y `apt search --names-only '^g\+\+-[0-9]+$' | grep '^g++-[0-9]\+' | awk -F/ '{print $1}' | sort -V -r | head -n 1` >/dev/null
+#RUN CC=`ls -1 /usr/bin/gcc-* | grep '/gcc-[0-9]\+$' | sort -V -r | head -n 1`; CXX=${CC/gcc/g++}; echo "export CC=$CC CXX=$CXX" >>/etc/profile; (cd /usr/local/bin; ln -s $CC gcc; ln -s $CXX g++)
+#RUN cd /usr/local/bin; ln -s gcc cc; ln -s g++ c++
+COPY --from=gcc-builder   /opt/gcc/   /opt/gcc/
+RUN echo /opt/gcc/lib64 >/etc/ld.so.conf.d/opt-gcc.conf && ldconfig
+RUN echo 'export PATH+=:/opt/gcc/bin' >>/etc/profile
+ENV PATH="$PATH:/opt/gcc/bin"
+RUN echo 'export CC=/opt/gcc/bin/gcc CXX=/opt/gcc/bin/g++' >>/etc/profile
 
 # 安装 JFrog Conan
 RUN PATH+=:~/.local/bin pipx install conan
