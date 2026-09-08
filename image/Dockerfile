@@ -108,7 +108,7 @@ FROM base AS code-server-builder
 RUN apt install -y git tar gzip curl >/dev/null
 RUN mkdir -p /opt/code-server/{bin,lib}
 WORKDIR /opt/code-server
-RUN CODE_SERVER_VERSION=`git ls-remote --tags --refs https://github.com/coder/code-server.git 'refs/tags/v*' | sed -E s/'^[[:xdigit:]]+[[:space:]]+refs\/tags\/v'// | egrep '^[0-9]+(\.[0-9]+)*$' | sort -V -r | head -1`; curl -fL https://github.com/coder/code-server/releases/download/v$CODE_SERVER_VERSION/code-server-$CODE_SERVER_VERSION-linux-`sed -e s/'^x86_64$'/amd64/ -e s/'^aarch64$'/arm64/ <<<$HOSTTYPE`.tar.gz | tar -C ./lib -xz
+RUN CODE_SERVER_VERSION=`git ls-remote --tags --refs https://github.com/coder/code-server.git 'refs/tags/v*' | sed -E s/'^[[:xdigit:]]+[[:space:]]+refs\/tags\/v'// | egrep '^[0-9]+(\.[0-9]+)*$' | sort -V -r | head -1`; curl -sfL https://github.com/coder/code-server/releases/download/v$CODE_SERVER_VERSION/code-server-$CODE_SERVER_VERSION-linux-`sed -e s/'^x86_64$'/amd64/ -e s/'^aarch64$'/arm64/ <<<$HOSTTYPE`.tar.gz | tar -C ./lib -xz
 RUN cd lib; CODE_SERVER_LIB=$(echo code-server-*-linux-`sed -e s/'^x86_64$'/amd64/ -e s/'^aarch64$'/arm64/ <<<$HOSTTYPE`); mv $CODE_SERVER_LIB ${CODE_SERVER_LIB%-linux-*}
 RUN cd bin; ln -s ../lib/code-server-*/bin/code-server code-server
 
@@ -205,8 +205,8 @@ COPY --from=vscode-builder /usr/local/bin/code /usr/local/bin/
 #RUN echo 'export PATH+=:/opt/gcc/bin' >>/etc/profile
 #ENV PATH="$PATH:/opt/gcc/bin"
 #RUN echo 'export CC=/opt/gcc/bin/gcc CXX=/opt/gcc/bin/g++' >>/etc/profile
-RUN apt install -y `apt search --names-only '^g\+\+-[0-9]+$' | grep '^g++-[0-9]\+' | awk -F/ '{print $1}' | sort -Vr | head -n 1` >/dev/null
-RUN CC=`ls -1 /usr/bin/gcc-* | grep '/gcc-[0-9]\+$' | sort -Vr | head -n 1`; CXX=${CC/gcc/g++}; echo "export CC=$CC CXX=$CXX" >>/etc/profile; (cd /usr/local/bin; ln -s $CC gcc; ln -s $CXX g++)
+RUN apt install -y `apt search --names-only '^g\+\+-[0-9]+$' | grep '^g++-[0-9]\+' | awk -F/ '{print $1}' | sort -V -r | head -n 1` >/dev/null
+RUN CC=`ls -1 /usr/bin/gcc-* | grep '/gcc-[0-9]\+$' | sort -V -r | head -n 1`; CXX=${CC/gcc/g++}; echo "export CC=$CC CXX=$CXX" >>/etc/profile; (cd /usr/local/bin; ln -s $CC gcc; ln -s $CXX g++)
 RUN cd /usr/local/bin; ln -s gcc cc; ln -s g++ c++
 
 # 安装 JFrog Conan
