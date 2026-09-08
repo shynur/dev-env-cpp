@@ -66,16 +66,13 @@ RUN apt install -y libc6-dev binutils make >/dev/null
 COPY --from=cmake-builder /opt/cmake/ /opt/cmake/
 ENV PATH="$PATH:/opt/cmake/bin"
 
-COPY --from=gcc-builder   /opt/gcc/   /opt/gcc/
-ENV CC=/opt/gcc/bin/gcc CXX=/opt/gcc/bin/g++
-
 # --------------------------------
 
 #FROM cmake-user AS <SDK>-builder
 #ARG USER=
 #ARG REPO=
 #ARG TAG=
-#RUN apt install -y git
+#RUN apt install -y git g++
 #WORKDIR /tmp
 #RUN git clone --single-branch --branch=${TAG} --depth=1 https://github.com/${USER}/${REPO}.git
 #RUN cmake -S ${REPO} -B build -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Debug
@@ -194,7 +191,7 @@ COPY --from=cmake-builder /opt/cmake/ /opt/cmake/
 RUN echo 'export PATH+=:/opt/cmake/bin' >>/etc/profile
 ENV PATH="$PATH:/opt/cmake/bin"
 
-# 安装 CMake
+# 安装 code-server
 COPY --from=code-server-builder /opt/code-server/ /opt/code-server/
 RUN echo 'export PATH+=:/opt/code-server/bin' >>/etc/profile
 ENV PATH="$PATH:/opt/code-server/bin"
@@ -203,11 +200,14 @@ ENV PATH="$PATH:/opt/code-server/bin"
 COPY --from=vscode-builder /usr/local/bin/code /usr/local/bin/
 
 # 安装 GCC
-COPY --from=gcc-builder   /opt/gcc/   /opt/gcc/
-RUN echo /opt/gcc/lib64 >/etc/ld.so.conf.d/opt-gcc.conf && ldconfig
-RUN echo 'export PATH+=:/opt/gcc/bin' >>/etc/profile
-ENV PATH="$PATH:/opt/gcc/bin"
-RUN echo 'export CC=/opt/gcc/bin/gcc CXX=/opt/gcc/bin/g++' >>/etc/profile
+#COPY --from=gcc-builder   /opt/gcc/   /opt/gcc/
+#RUN echo /opt/gcc/lib64 >/etc/ld.so.conf.d/opt-gcc.conf && ldconfig
+#RUN echo 'export PATH+=:/opt/gcc/bin' >>/etc/profile
+#ENV PATH="$PATH:/opt/gcc/bin"
+#RUN echo 'export CC=/opt/gcc/bin/gcc CXX=/opt/gcc/bin/g++' >>/etc/profile
+RUN apt install -y `apt search --names-only '^g\+\+-[0-9]+$' | grep '^g++-[0-9]\+' | awk -F/ '{print $1}' | sort -Vr | head -n 1` >/dev/null
+RUN CC=`ls -1 /usr/bin/gcc-* | grep '/gcc-[0-9]\+$' | sort -Vr | head -n 1`; CXX=${CC/gcc/g++}; echo "export CC=$CC CXX=$CXX" >>/etc/profile; (cd /usr/local/bin; ln -s $CC gcc; ln -s $CXX g++)
+RUN cd /usr/local/bin; ln -s gcc cc; ln -s g++ c++
 
 # 安装 JFrog Conan
 RUN PATH+=:~/.local/bin pipx install conan
