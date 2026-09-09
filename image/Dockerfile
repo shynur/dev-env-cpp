@@ -220,7 +220,7 @@ RUN echo 'tools.build:cflags=["-O0", "-g0"]'   >>~/.conan2/profiles/default
 RUN echo 'tools.build:cxxflags=["-O0", "-g0"]' >>~/.conan2/profiles/default
 RUN echo 'tools.build:sharedlinkflags=["-g0"]' >>~/.conan2/profiles/default
 RUN echo 'tools.build:exelinkflags=["-g0"]'    >>~/.conan2/profiles/default
-RUN echo 'tools.cmake.cmaketoolchain:extra_variables={"CMAKE_C_FLAGS_DEBUG":"-g0","CMAKE_CXX_FLAGS_DEBUG":"-g0"}' >>~/.conan2/profiles/default
+#RUN echo 'tools.cmake.cmaketoolchain:extra_variables={"CMAKE_C_FLAGS_DEBUG":"-g0","CMAKE_CXX_FLAGS_DEBUG":"-g0"}' >>~/.conan2/profiles/default
 
 # 安装 AI CLI
 RUN . ~/.nvm/nvm.sh; npm install -g @anthropic-ai/claude-code @openai/codex @moonshot-ai/kimi-code `#@google/gemini-cli` `#@github/copilot`; rm -rf /tmp/node-compile-cache
