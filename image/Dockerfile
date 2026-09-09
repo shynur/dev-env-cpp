@@ -216,12 +216,12 @@ RUN PATH+=:~/.local/bin conan profile detect --force
 RUN sed -i s/'^build_type=.\+$'/build_type=Debug/                                                        ~/.conan2/profiles/default
 RUN sed -i s/'^compiler.cppstd=.\+$'/compiler.cppstd=`~/.local/bin/latest-available-cppstd-of.bash c++`/ ~/.conan2/profiles/default
 RUN cat <<'EOF' >>~/.conan2/profiles/default
-[conf]
-tools.build:cflags=["-O0", "-g0"]
-tools.build:cxxflags=["-O0", "-g0"]
-tools.build:sharedlinkflags=["-g0"]
-tools.build:exelinkflags=["-g0"]
-tools.cmake.cmaketoolchain:extra_variables={ "CMAKE_C_FLAGS_DEBUG": "-g0", "CMAKE_CXX_FLAGS_DEBUG": "-g0" }
+#[conf]
+#tools.build:cflags=["-O0", "-g0"]
+#tools.build:cxxflags=["-O0", "-g0"]
+#tools.build:sharedlinkflags=["-g0"]
+#tools.build:exelinkflags=["-g0"]
+#tools.cmake.cmaketoolchain:extra_variables={ "CMAKE_C_FLAGS_DEBUG": "-g0", "CMAKE_CXX_FLAGS_DEBUG": "-g0" }
 EOF
 
 # 安装 AI CLI
